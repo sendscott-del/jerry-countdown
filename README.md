@@ -12,5 +12,8 @@ To swap the target date (e.g. to the pessimistic 2034 fallback), edit the `TARGE
 
 ## Changelog
 
+### v1.1.0 — 2026-04-18
+- Added on-page timeline toggle: **He goes willingly** (Jan 1, 2029) vs **Ishbia drags him out** (Nov 1, 2034). Choice is persisted in `localStorage`. Subhead updates to match the active scenario, and a small footnote explains why both dates exist.
+
 ### v1.0.0 — 2026-04-18
 - Initial build: countdown timer (D/H/M/S), 10 rotating roasts on a 6s crossfade, mobile 2x2 layout, reduced-motion support, endgame swap when the timer hits zero.

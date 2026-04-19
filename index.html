@@ -93,6 +93,46 @@
     letter-spacing: 0.05em;
   }
 
+  .toggle {
+    margin-top: clamp(1rem, 2vw, 1.4rem);
+    display: inline-flex;
+    border: 1px solid var(--muted);
+    border-radius: 999px;
+    overflow: hidden;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  }
+
+  .toggle button {
+    appearance: none;
+    background: transparent;
+    color: var(--muted);
+    border: 0;
+    padding: 0.5rem 0.95rem;
+    font-size: clamp(0.7rem, 1.1vw, 0.8rem);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 200ms ease, color 200ms ease;
+  }
+
+  .toggle button:hover { color: var(--fg); }
+
+  .toggle button[aria-pressed="true"] {
+    background: var(--fg);
+    color: #000;
+    cursor: default;
+  }
+
+  .footnote {
+    margin: 0.85rem auto 0;
+    max-width: 560px;
+    color: var(--muted);
+    font-size: clamp(0.7rem, 1.05vw, 0.78rem);
+    font-style: italic;
+    line-height: 1.5;
+    letter-spacing: 0.02em;
+  }
+
   .roast-wrap {
     margin-top: clamp(2rem, 5vw, 3.25rem);
     width: 100%;
@@ -176,7 +216,16 @@
       </div>
     </div>
 
-    <p class="subhead">First day the Ishbia sale window opens. January 1, 2029.</p>
+    <p class="subhead" id="subhead">First day Jerry can sell to Ishbia. January 1, 2029.</p>
+
+    <div class="toggle" role="group" aria-label="Choose your timeline">
+      <button id="mode-optimist" type="button" aria-pressed="true">He goes willingly</button>
+      <button id="mode-pessimist" type="button" aria-pressed="false">Ishbia drags him out</button>
+    </div>
+
+    <p class="footnote">
+      The contract gives Jerry first dibs to sell from 2029 to 2033. If he stalls, Ishbia can finally force him out after the 2034 season. Pick your level of faith in humanity.
+    </p>
 
     <div class="roast-wrap">
       <blockquote class="roast" id="roast"></blockquote>
@@ -186,13 +235,21 @@
   </main>
 
 <script>
-  // First day of the Ishbia sale window — Jerry's earliest option to sell.
-  // Locked to America/Chicago (Central Standard Time, UTC-06:00) so the
-  // countdown is identical regardless of the visitor's timezone.
-  const TARGET_DATE = new Date('2029-01-01T00:00:00-06:00');
-  // Pessimistic alternate: first day after the 2034 season ends, when
-  // Ishbia gets the unilateral option to force the sale.
-  // const TARGET_DATE = new Date('2034-11-01T00:00:00-05:00');
+  // Two scenarios, both locked to America/Chicago so the countdown is
+  // identical regardless of visitor timezone.
+  //   optimist  — Jan 1, 2029, the first day Jerry himself can sell to Ishbia.
+  //   pessimist — Nov 1, 2034, the first day Ishbia can force a sale if Jerry stalls.
+  const TARGETS = {
+    optimist:  new Date('2029-01-01T00:00:00-06:00'),
+    pessimist: new Date('2034-11-01T00:00:00-05:00')
+  };
+  const SUBHEAD = {
+    optimist:  'First day Jerry can sell to Ishbia. January 1, 2029.',
+    pessimist: 'First day Ishbia can force him out. November 1, 2034.'
+  };
+  const STORAGE_KEY = 'jerryMode';
+  let mode = (localStorage.getItem(STORAGE_KEY) === 'pessimist') ? 'pessimist' : 'optimist';
+  let TARGET_DATE = TARGETS[mode];
 
   const roasts = [
     "Jerry Reinsdorf bought the White Sox in 1981 for about $20 million. They are now valued over $2 billion. He has delivered exactly one World Series in that span.",
@@ -214,6 +271,9 @@
   const $countdown = document.getElementById('countdown');
   const $app = document.getElementById('app');
   const $roast = document.getElementById('roast');
+  const $subhead = document.getElementById('subhead');
+  const $optimist = document.getElementById('mode-optimist');
+  const $pessimist = document.getElementById('mode-pessimist');
 
   const pad2 = (n) => String(n).padStart(2, '0');
   const pad3 = (n) => String(n).padStart(3, '0');
@@ -263,8 +323,22 @@
     }, 400);
   }
 
+  function applyMode(next) {
+    mode = next;
+    TARGET_DATE = TARGETS[mode];
+    localStorage.setItem(STORAGE_KEY, mode);
+    $subhead.textContent = SUBHEAD[mode];
+    $optimist.setAttribute('aria-pressed', mode === 'optimist');
+    $pessimist.setAttribute('aria-pressed', mode === 'pessimist');
+    endgameTriggered = false;
+    updateCountdown();
+  }
+
+  $optimist.addEventListener('click', () => applyMode('optimist'));
+  $pessimist.addEventListener('click', () => applyMode('pessimist'));
+
   // Paint immediately so there's no flash of zeros.
-  updateCountdown();
+  applyMode(mode);
   showRoast(0);
 
   setInterval(updateCountdown, 1000);
