@@ -12,6 +12,9 @@ To swap the target date (e.g. to the pessimistic 2034 fallback), edit the `TARGE
 
 ## Changelog
 
+### v1.2.1 — 2026-04-18
+- Reworded the page header from "Time until Jerry can go away" to "The Reinsdorf era ends in" — same dry tone, sharper framing.
+
 ### v1.2.0 — 2026-04-18
 - Replaced the writer's-room roasts with **10 verified real-world quotes** about Reinsdorf's ownership, pulled from Defector, the Chicago Sun-Times, the Chicago Tribune, and The Athletic. Each rotating card now shows the quote plus a clickable attribution (author, outlet, date) linking back to the source article.
 
