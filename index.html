@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Jerry Countdown</title>
+<meta name="description" content="A live countdown to the day Jerry Reinsdorf can sell the Chicago White Sox to Justin Ishbia." />
+<meta name="robots" content="index, follow" />
+<style>
+  :root {
+    --bg: #000;
+    --fg: #f4f4f0;
+    --muted: #8a8d8f;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: ui-sans-serif, system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1.25rem;
+    text-align: center;
+  }
+
+  .header {
+    color: var(--muted);
+    font-size: clamp(0.75rem, 1.6vw, 1rem);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: clamp(1.25rem, 3vw, 2.25rem);
+  }
+
+  .countdown {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: clamp(0.5rem, 2vw, 1.5rem);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    line-height: 1;
+  }
+
+  .segment {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 0;
+  }
+
+  .segment .num {
+    font-size: clamp(3rem, 14vw, 10rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    color: var(--fg);
+  }
+
+  .segment .label {
+    margin-top: 0.5rem;
+    font-size: clamp(0.65rem, 1.2vw, 0.85rem);
+    letter-spacing: 0.3em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .colon {
+    font-size: clamp(2.25rem, 10vw, 7rem);
+    color: var(--muted);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    font-weight: 300;
+    align-self: flex-start;
+    line-height: 1;
+    padding-top: 0.05em;
+  }
+
+  .subhead {
+    margin-top: clamp(1.25rem, 3vw, 2rem);
+    color: var(--muted);
+    font-size: clamp(0.85rem, 1.4vw, 1rem);
+    letter-spacing: 0.05em;
+  }
+
+  .roast-wrap {
+    margin-top: clamp(2rem, 5vw, 3.25rem);
+    width: 100%;
+    max-width: 640px;
+    min-height: 6.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .roast {
+    font-style: italic;
+    font-size: clamp(0.95rem, 1.6vw, 1.125rem);
+    line-height: 1.55;
+    color: var(--fg);
+    transition: opacity 400ms ease;
+    border-left: 2px solid var(--muted);
+    padding: 0.5rem 1.25rem;
+    text-align: left;
+  }
+
+  .roast.is-hidden { opacity: 0; }
+
+  .footer {
+    margin-top: clamp(2rem, 5vw, 3.5rem);
+    color: var(--muted);
+    font-size: clamp(0.7rem, 1.1vw, 0.8rem);
+    letter-spacing: 0.05em;
+    max-width: 640px;
+  }
+
+  .endgame {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    font-size: clamp(2rem, 8vw, 5rem);
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    color: var(--fg);
+    text-align: center;
+  }
+
+  @media (max-width: 640px) {
+    .countdown {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem 1.5rem;
+      max-width: 360px;
+    }
+    .colon { display: none; }
+    .segment .num { font-size: clamp(2.75rem, 18vw, 4.5rem); }
+    .roast { padding: 0.5rem 1rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .roast { transition: none; }
+  }
+</style>
+</head>
+<body>
+  <main id="app">
+    <div class="header">Time until Jerry can go away</div>
+
+    <div class="countdown" id="countdown" aria-live="off">
+      <div class="segment">
+        <div class="num" id="days">0000</div>
+        <div class="label">Days</div>
+      </div>
+      <div class="colon" aria-hidden="true">:</div>
+      <div class="segment">
+        <div class="num" id="hours">00</div>
+        <div class="label">Hours</div>
+      </div>
+      <div class="colon" aria-hidden="true">:</div>
+      <div class="segment">
+        <div class="num" id="minutes">00</div>
+        <div class="label">Minutes</div>
+      </div>
+      <div class="colon" aria-hidden="true">:</div>
+      <div class="segment">
+        <div class="num" id="seconds">00</div>
+        <div class="label">Seconds</div>
+      </div>
+    </div>
+
+    <p class="subhead">First day the Ishbia sale window opens. January 1, 2029.</p>
+
+    <div class="roast-wrap">
+      <blockquote class="roast" id="roast"></blockquote>
+    </div>
+
+    <p class="footer">Not affiliated with the Chicago White Sox, Jerry Reinsdorf, or anyone who's ever made a good baseball decision.</p>
+  </main>
+
+<script>
+  // First day of the Ishbia sale window — Jerry's earliest option to sell.
+  // Locked to America/Chicago (Central Standard Time, UTC-06:00) so the
+  // countdown is identical regardless of the visitor's timezone.
+  const TARGET_DATE = new Date('2029-01-01T00:00:00-06:00');
+  // Pessimistic alternate: first day after the 2034 season ends, when
+  // Ishbia gets the unilateral option to force the sale.
+  // const TARGET_DATE = new Date('2034-11-01T00:00:00-05:00');
+
+  const roasts = [
+    "Jerry Reinsdorf bought the White Sox in 1981 for about $20 million. They are now valued over $2 billion. He has delivered exactly one World Series in that span.",
+    "The 2024 White Sox lost 121 games. That is the most losses by any team in modern MLB history. Congratulations.",
+    "Since the 2005 World Series, the White Sox have won a grand total of three playoff games.",
+    "In 44 years of Reinsdorf ownership, the White Sox have made the playoffs 7 times. The Bulls — who he also owns — have made it 36.",
+    "He is 89 years old and the contract lets him keep the team for at least four more years. He could have just retired. He chose this.",
+    "He sold the stadium naming rights to a mortgage company. Then a different mortgage company. That is the level of planning.",
+    "He reportedly took meetings with the mayor of Nashville about relocating the team. To the home city of Justin Ishbia's alma mater. Read that sentence again.",
+    "The contract with Ishbia doesn't even force a sale. Jerry has the option from 2029 to 2033. Ishbia can only force it after the 2034 season. Jerry could still be here at 98.",
+    "Adjusted 2025 payroll: under $68 million. Only two players making over $10 million. For a team worth two billion dollars.",
+    "You know what? Just look at the number above. That's the roast."
+  ];
+
+  const $days = document.getElementById('days');
+  const $hours = document.getElementById('hours');
+  const $minutes = document.getElementById('minutes');
+  const $seconds = document.getElementById('seconds');
+  const $countdown = document.getElementById('countdown');
+  const $app = document.getElementById('app');
+  const $roast = document.getElementById('roast');
+
+  const pad2 = (n) => String(n).padStart(2, '0');
+  const pad3 = (n) => String(n).padStart(3, '0');
+
+  let endgameTriggered = false;
+
+  function updateCountdown() {
+    const now = new Date();
+    const diff = TARGET_DATE.getTime() - now.getTime();
+
+    if (diff <= 0) {
+      if (endgameTriggered) return;
+      endgameTriggered = true;
+      $app.innerHTML = '<div class="endgame">HE\'S OUT. BREATHE.</div>';
+      return;
+    }
+
+    const totalSeconds = Math.floor(diff / 1000);
+    const days = Math.floor(totalSeconds / 86400);
+    const hours = Math.floor((totalSeconds % 86400) / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    $days.textContent = days >= 1000 ? String(days) : pad3(days);
+    $hours.textContent = pad2(hours);
+    $minutes.textContent = pad2(minutes);
+    $seconds.textContent = pad2(seconds);
+  }
+
+  let roastIndex = 0;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function showRoast(i) {
+    $roast.textContent = roasts[i];
+  }
+
+  function rotateRoast() {
+    roastIndex = (roastIndex + 1) % roasts.length;
+    if (reduceMotion) {
+      showRoast(roastIndex);
+      return;
+    }
+    $roast.classList.add('is-hidden');
+    setTimeout(() => {
+      showRoast(roastIndex);
+      $roast.classList.remove('is-hidden');
+    }, 400);
+  }
+
+  // Paint immediately so there's no flash of zeros.
+  updateCountdown();
+  showRoast(0);
+
+  setInterval(updateCountdown, 1000);
+  setInterval(rotateRoast, 6000);
+</script>
+</body>
+</html>
