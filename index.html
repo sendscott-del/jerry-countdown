@@ -144,15 +144,35 @@
   }
 
   .roast {
-    font-style: italic;
-    font-size: clamp(0.95rem, 1.6vw, 1.125rem);
-    line-height: 1.55;
-    color: var(--fg);
     transition: opacity 400ms ease;
     border-left: 2px solid var(--muted);
     padding: 0.5rem 1.25rem;
     text-align: left;
   }
+
+  .roast .quote {
+    font-style: italic;
+    font-size: clamp(0.95rem, 1.6vw, 1.125rem);
+    line-height: 1.55;
+    color: var(--fg);
+    margin: 0;
+  }
+
+  .roast .attribution {
+    margin-top: 0.5rem;
+    font-size: clamp(0.7rem, 1.05vw, 0.78rem);
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+
+  .roast .attribution a {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: rgba(138, 141, 143, 0.4);
+    text-underline-offset: 2px;
+  }
+
+  .roast .attribution a:hover { color: var(--fg); }
 
   .roast.is-hidden { opacity: 0; }
 
@@ -228,7 +248,10 @@
     </p>
 
     <div class="roast-wrap">
-      <blockquote class="roast" id="roast"></blockquote>
+      <blockquote class="roast" id="roast">
+        <p class="quote" id="roast-quote"></p>
+        <div class="attribution" id="roast-attribution"></div>
+      </blockquote>
     </div>
 
     <p class="footer">Not affiliated with the Chicago White Sox, Jerry Reinsdorf, or anyone who's ever made a good baseball decision.</p>
@@ -251,17 +274,79 @@
   let mode = (localStorage.getItem(STORAGE_KEY) === 'pessimist') ? 'pessimist' : 'optimist';
   let TARGET_DATE = TARGETS[mode];
 
+  // All quotes below are verbatim from published primary sources.
+  // Each entry: { quote, author, outlet, date, url }
   const roasts = [
-    "Jerry Reinsdorf bought the White Sox in 1981 for about $20 million. They are now valued over $2 billion. He has delivered exactly one World Series in that span.",
-    "The 2024 White Sox lost 121 games. That is the most losses by any team in modern MLB history. Congratulations.",
-    "Since the 2005 World Series, the White Sox have won a grand total of three playoff games.",
-    "In 44 years of Reinsdorf ownership, the White Sox have made the playoffs 7 times. The Bulls — who he also owns — have made it 36.",
-    "He is 89 years old and the contract lets him keep the team for at least four more years. He could have just retired. He chose this.",
-    "He sold the stadium naming rights to a mortgage company. Then a different mortgage company. That is the level of planning.",
-    "He reportedly took meetings with the mayor of Nashville about relocating the team. To the home city of Justin Ishbia's alma mater. Read that sentence again.",
-    "The contract with Ishbia doesn't even force a sale. Jerry has the option from 2029 to 2033. Ishbia can only force it after the 2034 season. Jerry could still be here at 98.",
-    "Adjusted 2025 payroll: under $68 million. Only two players making over $10 million. For a team worth two billion dollars.",
-    "You know what? Just look at the number above. That's the roast."
+    {
+      quote: "Jerry Reinsdorf sure isn't acting like the owner of a club about to break the record for losses in a season.",
+      author: "Rick Morrissey",
+      outlet: "Chicago Sun-Times",
+      date: "Sept. 18, 2024",
+      url: "https://chicago.suntimes.com/white-sox/2024/09/18/worst-team-ever-wants-money-for-new-stadium-lower-2025-payroll-wanna-be-white-sox-fan-jerry-reinsdorf"
+    },
+    {
+      quote: "How bad do you have to be to win a billion dollars worth of pity, and then ask for double that?",
+      author: "Ray Ratto",
+      outlet: "Defector",
+      date: "July 29, 2024",
+      url: "https://defector.com/why-are-the-white-sox-like-this"
+    },
+    {
+      quote: "Look, we're not going to be in the (Shohei) Ohtani race, I'll tell you that right now. And we're not going to sign pitchers to 10-year deals.",
+      author: "Jerry Reinsdorf himself",
+      outlet: "quoted by Paul Sullivan, Chicago Tribune",
+      date: "Sept. 28, 2024",
+      url: "https://sports.yahoo.com/column-2024-chicago-white-sox-191700210.html"
+    },
+    {
+      quote: "It was not given the title as 'worst team ever.' The Sox earned it.",
+      author: "Paul Sullivan",
+      outlet: "Chicago Tribune",
+      date: "Sept. 28, 2024",
+      url: "https://sports.yahoo.com/column-2024-chicago-white-sox-191700210.html"
+    },
+    {
+      quote: "[Reinsdorf is] a baseball fan owner who thinks he knows everything, and maybe he did in 1992, but the amount of info has skyrocketed in the last 30 years and he's put his middle finger up at that.",
+      author: "Anonymous former White Sox employee",
+      outlet: "Ken Rosenthal & Britt Ghiroli, The Athletic",
+      date: "Sept. 2024",
+      url: "https://bleacherreport.com/articles/10136015-white-soxs-jerry-reinsdorf-ripped-in-report-amid-woes-thinks-he-knows-everything"
+    },
+    {
+      quote: "Reinsdorf isn't cheap, but he's definitely not aggressive.",
+      author: "Laurence W. Holmes",
+      outlet: "Chicago Sun-Times",
+      date: "Feb. 14, 2023",
+      url: "https://chicago.suntimes.com/sports/2023/2/14/23600339/jerry-reinsdorf-bulls-white-sox-owner-chairman-commitment-desire-winning"
+    },
+    {
+      quote: "Fighting for the play-in tournament should be beneath Reinsdorf.",
+      author: "Laurence W. Holmes",
+      outlet: "Chicago Sun-Times",
+      date: "Feb. 14, 2023",
+      url: "https://chicago.suntimes.com/sports/2023/2/14/23600339/jerry-reinsdorf-bulls-white-sox-owner-chairman-commitment-desire-winning"
+    },
+    {
+      quote: "Jerry Reinsdorf's estate planning includes an inexplicable desire to punish Tennesseeans.",
+      author: "Ray Ratto",
+      outlet: "Defector",
+      date: "July 29, 2024",
+      url: "https://defector.com/why-are-the-white-sox-like-this"
+    },
+    {
+      quote: "But no organization should ever field a team as poorly constructed as the 2024 White Sox and then talk about bad breaks or frustrating losses.",
+      author: "Paul Sullivan",
+      outlet: "Chicago Tribune",
+      date: "Sept. 28, 2024",
+      url: "https://sports.yahoo.com/column-2024-chicago-white-sox-191700210.html"
+    },
+    {
+      quote: "The slashed payroll for 2025 and the talk of public funding for a new ballpark? That's piled-on heartlessness.",
+      author: "Rick Morrissey",
+      outlet: "Chicago Sun-Times",
+      date: "Sept. 18, 2024",
+      url: "https://chicago.suntimes.com/white-sox/2024/09/18/worst-team-ever-wants-money-for-new-stadium-lower-2025-payroll-wanna-be-white-sox-fan-jerry-reinsdorf"
+    }
   ];
 
   const $days = document.getElementById('days');
@@ -271,6 +356,8 @@
   const $countdown = document.getElementById('countdown');
   const $app = document.getElementById('app');
   const $roast = document.getElementById('roast');
+  const $roastQuote = document.getElementById('roast-quote');
+  const $roastAttribution = document.getElementById('roast-attribution');
   const $subhead = document.getElementById('subhead');
   const $optimist = document.getElementById('mode-optimist');
   const $pessimist = document.getElementById('mode-pessimist');
@@ -307,7 +394,19 @@
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function showRoast(i) {
-    $roast.textContent = roasts[i];
+    const r = roasts[i];
+    $roastQuote.textContent = '\u201C' + r.quote + '\u201D';
+    $roastAttribution.innerHTML = '';
+    const dash = document.createTextNode('\u2014 ');
+    const link = document.createElement('a');
+    link.href = r.url;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.textContent = r.author;
+    const tail = document.createTextNode(', ' + r.outlet + ', ' + r.date);
+    $roastAttribution.appendChild(dash);
+    $roastAttribution.appendChild(link);
+    $roastAttribution.appendChild(tail);
   }
 
   function rotateRoast() {
